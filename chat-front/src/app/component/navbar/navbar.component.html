@@ -1,0 +1,10 @@
+@if (sessionService.isAuthenticated()) {
+  <header class="header">
+    <nav class="desktop-menu">
+      <div class="user-icon" routerLink="/profile" routerLinkActive="active-link">
+<!--        <img [src]="isProfileActive() ? 'assets/user-active.png' : 'assets/user.png'" alt="Profile Picture">-->
+      </div>
+    </nav>
+
+  </header>
+}
