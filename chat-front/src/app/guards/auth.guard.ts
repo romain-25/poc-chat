@@ -19,7 +19,7 @@ export class AuthGuard implements CanActivate {
    */
   public canActivate(): boolean {
     if (!this.sessionService.isLogged) {
-      localStorage.clear()
+      sessionStorage.clear()
       this.router.navigate(['login']);
       return false;
     }

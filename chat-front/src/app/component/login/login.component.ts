@@ -13,7 +13,6 @@ import {SessionService} from "../../service/session.service";
   standalone: true,
   imports: [
     MatButton,
-    RouterLink,
     ReactiveFormsModule,
     BackComponent
   ],

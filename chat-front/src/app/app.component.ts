@@ -16,7 +16,7 @@ export class AppComponent {
   ngOnInit(){
     this.sessionService.initSession();
     if (!this.sessionService.isAuthenticated()) {
-      localStorage.clear()
+      sessionStorage.clear()
       this.sessionService.router.navigate(['/login']);
     }
   }

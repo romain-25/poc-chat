@@ -1,4 +1,4 @@
-import {inject, Injectable} from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Client } from '@stomp/stompjs';
 import { BehaviorSubject, Observable } from 'rxjs';
 
@@ -8,21 +8,32 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class WebsocketService {
   private stompClient: Client | null = null;
   private messageSubject: BehaviorSubject<string> = new BehaviorSubject<string>('');
-  websocket : WebSocket = inject(WebSocket);
+  websocket: WebSocket;
+
   constructor() {
+    this.websocket = new WebSocket('ws://localhost:3001/api/ws');
     this.connect();
   }
-  test(){
-    this.websocket = new WebSocket('ws://localhost:3001/api/ws');
+
+  test() {
+    // Test basique de connexion WebSocket
+    const token = sessionStorage.getItem('tokenModel');
+    this.websocket = new WebSocket(`ws://localhost:3001/api/ws?token=${token}`);
   }
+
   connect(): void {
     if (this.stompClient && this.stompClient.active) {
       console.log('Déjà connecté.');
       return;
     }
 
+    const token = sessionStorage.getItem('tokenModel');
+
     this.stompClient = new Client({
-      brokerURL: 'ws://localhost:3001/api/ws'
+      brokerURL: 'ws://localhost:3001/api/ws',
+      connectHeaders: {
+        Authorization: `Bearer ${token}`
+      }
     });
 
     this.stompClient.onConnect = () => {
@@ -42,11 +53,15 @@ export class WebsocketService {
 
   sendMessage(message: string): void {
     if (this.stompClient && this.stompClient.connected) {
-      this.stompClient.publish({ destination: '/app/chat', body: message });
+      this.stompClient.publish({
+        destination: '/app/sendMessage',
+        body: message
+      });
     } else {
       console.error('STOMP non connecté. Impossible d\'envoyer le message.');
     }
   }
+
 
   getMessages(): Observable<string> {
     return this.messageSubject.asObservable();

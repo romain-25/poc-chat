@@ -24,7 +24,7 @@ export class JwtInterceptor implements HttpInterceptor {
       return next.handle(request);
     }
 
-    let tokenJson: string | null = localStorage.getItem('tokenModel');
+    let tokenJson: string | null = sessionStorage.getItem('tokenModel');
     let tokenModel: TokenModel = {} as TokenModel;
 
     if (tokenJson) {

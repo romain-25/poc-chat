@@ -66,6 +66,7 @@ public class SpringSecurityConfig {
                 )
                 .build();
     }
+
     /**
      * Configures the BCryptPasswordEncoder bean.
      *

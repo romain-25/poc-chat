@@ -25,7 +25,7 @@ export class SessionService {
    * @param tokenModel The model containing the token information to be saved.
    */
   setSession(tokenModel: TokenModel): void {
-    localStorage.setItem(this.tokenKey, JSON.stringify(tokenModel));
+    sessionStorage.setItem(this.tokenKey, JSON.stringify(tokenModel));
   }
   /**
    * Retrieves the token model from local storage.
@@ -34,7 +34,7 @@ export class SessionService {
    */
   getSession(): TokenModel | null {
     if (isPlatformBrowser(this.platformId)) {
-      const tokenJson = localStorage.getItem(this.tokenKey);
+      const tokenJson = sessionStorage.getItem(this.tokenKey);
       if (tokenJson) {
         return JSON.parse(tokenJson);
       }
@@ -58,7 +58,7 @@ export class SessionService {
    * If a token exists, it restores the session and sets the authentication status.
    */
   initSession() {
-    const tokenJson = localStorage.getItem(this.tokenKey);
+    const tokenJson = sessionStorage.getItem(this.tokenKey);
     if (tokenJson) {
       const tokenModel = JSON.parse(tokenJson);
       this.setSession(tokenModel);
@@ -76,7 +76,7 @@ export class SessionService {
    */
   public logIn(token: TokenModel): void {
     if(token){
-      localStorage.setItem('tokenModel', JSON.stringify(token));
+      sessionStorage.setItem('tokenModel', JSON.stringify(token));
       this.isLogged = true;
       this.router.navigate(['/chat'])
       this.next();
@@ -86,7 +86,7 @@ export class SessionService {
    * Logs out the user by removing the token from local storage and navigating to the login page.
    */
   public logOut(): void {
-    localStorage.removeItem('tokenModel');
+    sessionStorage.removeItem('tokenModel');
     // this.user = undefined;
     this.isLogged = false;
     this.router.navigate(['/login'])
