@@ -1,0 +1,6 @@
+
+@for (message of messages; track message) {
+  <div>{{ message }}</div>
+}
+<input [(ngModel)]="newMessage" />
+<button (click)="sendMessage()">Envoyer</button>

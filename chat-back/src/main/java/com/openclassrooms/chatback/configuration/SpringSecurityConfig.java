@@ -54,14 +54,19 @@ public class SpringSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests((authz) -> authz
-                        .requestMatchers("/auth/login", "/auth/register").permitAll()
+                .authorizeHttpRequests(authz -> authz
+                        .requestMatchers("/auth/login", "/auth/register", "/ws/**").permitAll()
                         .anyRequest().authenticated()
                 )
+
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()))
+                .headers(headers -> headers
+                        .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'self'; connect-src 'self' ws://localhost:3001"))
+                )
                 .build();
     }
+
     /**
      * Configures the BCryptPasswordEncoder bean.
      *
