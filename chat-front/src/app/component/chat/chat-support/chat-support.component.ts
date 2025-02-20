@@ -26,8 +26,8 @@ import {MatCard, MatCardContent} from "@angular/material/card";
 })
 export class ChatSupportComponent {
   webSocketService: WebsocketService = inject(WebsocketService);
-  chatWindows: { [userId: string]: string[] } = {};
-  responses: { [userId: string]: string } = {};
+  chatWindows: { [userEmail: string]: string[] } = {};
+  responses: { [userEmail: string]: string } = {};
   ngOnInit() {
     this.webSocketService.connect('support', true);
     this.webSocketService.getMessages().subscribe((msg) => {
@@ -39,16 +39,16 @@ export class ChatSupportComponent {
         } else {
           const match = msg.match(/^(.+?): (.+)$/);
           if (!match) throw new Error('Format de message invalide');
-          data = { userId: match[1], message: match[2], from: 'user' };
+          data = { userEmail: match[1], message: match[2], from: 'user' };
         }
-
-        const userId = data.userId;
+        console.log('data', data);
+        const userEmail = data.userEmail;
         const message = data.message;
 
-        if (!this.chatWindows[userId]) {
-          this.chatWindows[userId] = [];
+        if (!this.chatWindows[userEmail]) {
+          this.chatWindows[userEmail] = [];
         }
-        this.chatWindows[userId].push(`[${data.from === 'support' ? 'Support' : 'User'}]: ${message}`);
+        this.chatWindows[userEmail].push(`[${data.from === 'support' ? 'Support' : 'User'}]: ${message}`);
       } catch (e) {
         console.error("Erreur lors de la réception du message :", msg);
       }
@@ -56,12 +56,11 @@ export class ChatSupportComponent {
 
 
   }
-  sendSupportResponse(userId: string): void {
-    const message = this.responses[userId]?.trim();
+  sendSupportResponse(userEmail: string): void {
+    const message = this.responses[userEmail]?.trim();
     if (message) {
-      this.webSocketService.sendSupportMessage(userId, message);
-      // this.chatWindows[userId].push(`[Support]: ${message}`);
-      this.responses[userId] = '';
+      this.webSocketService.sendSupportMessage(userEmail, message);
+      this.responses[userEmail] = '';
     }
   }
   protected readonly Object = Object;

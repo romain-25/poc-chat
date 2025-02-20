@@ -3,4 +3,5 @@ export interface TokenModel {
   id: number;
   email: string;
   username: string;
+  role: string;
 }

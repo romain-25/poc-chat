@@ -30,7 +30,7 @@ export class ChatComponent {
 
   ngOnInit(): void {
     this.infoUser()
-    this.websocketService.connect(String(this.tokenModel.id));
+    this.websocketService.connect(String(this.tokenModel.email));
     this.websocketService.getMessages().subscribe((msg) => {
       try {
         const data = JSON.parse(msg);
@@ -44,8 +44,7 @@ export class ChatComponent {
 
   sendMessage() {
     if (this.newMessage.trim()) {
-      this.websocketService.sendMessage(String(this.tokenModel.id), this.newMessage);
-      // this.messages.push(`[${this.tokenModel.email}]: ${this.newMessage}`);
+      this.websocketService.sendMessage(String(this.tokenModel.email), this.newMessage);
       this.newMessage = '';
     }
   }

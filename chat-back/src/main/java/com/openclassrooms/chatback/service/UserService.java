@@ -51,7 +51,7 @@ public class UserService {
             if(bcheckPassword) {
                 Authentication authentication = new UsernamePasswordAuthenticationToken(foundUser.getEmail(), null, new ArrayList<>());
                 String token = jwtService.generateToken(authentication);
-                TokenDto tokenDto = new TokenDto(token, foundUser.getId(), foundUser.getUsername(), foundUser.getEmail());
+                TokenDto tokenDto = new TokenDto(token, foundUser.getId(), foundUser.getUsername(), foundUser.getEmail(), foundUser.getRole());
                 return ResponseEntity.ok(tokenDto);
             }else{
                 // Mot de pass incorrect
@@ -73,10 +73,11 @@ public class UserService {
         if(foundUser == null) {
             UserModel user = modelMapper.map(userRegister, UserModel.class);
             user.setPassword(passwordEncoder.encode(userRegister.getPassword()));
+            user.setRole("USER");
             UserModel newUser = userRepository.save(user);
             Authentication authentication = new UsernamePasswordAuthenticationToken(newUser.getEmail(), null, new ArrayList<>());
             String token = jwtService.generateToken(authentication);
-            TokenDto tokenDto = new TokenDto(token, newUser.getId(), newUser.getUsername(), newUser.getEmail());
+            TokenDto tokenDto = new TokenDto(token, newUser.getId(), newUser.getUsername(), newUser.getEmail(), newUser.getRole());
             return ResponseEntity.ok(tokenDto);
         }else{
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Un utilisateur avec cet email existe déjà");

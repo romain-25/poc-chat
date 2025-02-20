@@ -9,7 +9,7 @@ export class WebsocketService {
   private stompClient: Client | null = null;
   private messageSubject: BehaviorSubject<string> = new BehaviorSubject<string>('');
 
-  connect(userId: string, isSupport: boolean = false): void {
+  connect(userEmail: string, isSupport: boolean = false): void {
     if (this.stompClient && this.stompClient.active) return;
 
     this.stompClient = new Client({
@@ -29,9 +29,9 @@ export class WebsocketService {
       }
 
       if (!isSupport) {
-        this.stompClient!.subscribe(`/topic/user/${userId}`, (message) => {
+        this.stompClient!.subscribe(`/topic/user/${userEmail}`, (message) => {
           const data = JSON.parse(message.body);
-          console.log(`Message reçu pour l'utilisateur ${userId}:`, data);
+          console.log(`Message reçu pour l'utilisateur ${userEmail}:`, data);
           this.messageSubject.next(JSON.stringify(data));
         });
       }
@@ -40,20 +40,20 @@ export class WebsocketService {
     this.stompClient.activate();
   }
 
-  sendMessage(userId: string, message: string): void {
+  sendMessage(userEmail: string, message: string): void {
     if (this.stompClient && this.stompClient.connected) {
       this.stompClient.publish({
         destination: '/app/sendMessage',
-        body: JSON.stringify({ userId, message })
+        body: JSON.stringify({ userEmail: userEmail, message })
       });
       this.messageSubject.next(`[Vous]: ${message}`);
     } else {
       console.error('STOMP non connecté.');
     }
   }
-  sendSupportMessage(userId: string, message: string): void {
+  sendSupportMessage(userEmail: string, message: string): void {
     if (this.stompClient && this.stompClient.connected) {
-      const payload = JSON.stringify({ userId, message, from: 'support' });
+      const payload = JSON.stringify({ userEmail, message, from: 'support' });
       this.stompClient.publish({
         destination: '/app/sendSupportMessage',
         body: payload

@@ -17,6 +17,8 @@ public class UserModel {
     @Column
     private Long id;
     @Column
+    private String role;
+    @Column
     private String username;
     @Column
     private String email;
