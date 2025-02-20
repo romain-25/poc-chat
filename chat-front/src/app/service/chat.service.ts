@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Client } from '@stomp/stompjs';
 import { BehaviorSubject, Observable } from 'rxjs';
 
@@ -8,57 +8,59 @@ import { BehaviorSubject, Observable } from 'rxjs';
 export class WebsocketService {
   private stompClient: Client | null = null;
   private messageSubject: BehaviorSubject<string> = new BehaviorSubject<string>('');
-  websocket: WebSocket;
 
-  constructor() {
-    this.websocket = new WebSocket('ws://localhost:3001/api/ws');
-    this.connect();
-  }
-
-  test() {
-    // Test basique de connexion WebSocket
-    const token = sessionStorage.getItem('tokenModel');
-    this.websocket = new WebSocket(`ws://localhost:3001/api/ws?token=${token}`);
-  }
-
-  connect(): void {
-    if (this.stompClient && this.stompClient.active) {
-      console.log('Déjà connecté.');
-      return;
-    }
-
-    const token = sessionStorage.getItem('tokenModel');
+  connect(userEmail: string, isSupport: boolean = false): void {
+    if (this.stompClient && this.stompClient.active) return;
 
     this.stompClient = new Client({
-      brokerURL: 'ws://localhost:3001/api/ws',
-      connectHeaders: {
-        Authorization: `Bearer ${token}`
-      }
+      brokerURL: 'ws://localhost:3001/api/ws'
     });
 
     this.stompClient.onConnect = () => {
       console.log('WebSocket connecté');
-      this.stompClient!.subscribe('/topic/messages', (message) => {
-        console.log('Message reçu du serveur:', message.body);
-        this.messageSubject.next(message.body);
-      });
-    };
 
-    this.stompClient.onStompError = (frame) => {
-      console.error('Erreur STOMP:', frame);
+      if (isSupport) {
+        this.stompClient!.subscribe('/topic/support', (message) => {
+          const data = JSON.parse(message.body);
+          if (data.from === 'support') return;
+          console.log(`Message reçu pour le support:`, data);
+          this.messageSubject.next(JSON.stringify(data));
+        });
+      }
+
+      if (!isSupport) {
+        this.stompClient!.subscribe(`/topic/user/${userEmail}`, (message) => {
+          const data = JSON.parse(message.body);
+          console.log(`Message reçu pour l'utilisateur ${userEmail}:`, data);
+          this.messageSubject.next(JSON.stringify(data));
+        });
+      }
     };
 
     this.stompClient.activate();
   }
 
-  sendMessage(message: string): void {
+  sendMessage(userEmail: string, message: string): void {
     if (this.stompClient && this.stompClient.connected) {
       this.stompClient.publish({
         destination: '/app/sendMessage',
-        body: message
+        body: JSON.stringify({ userEmail: userEmail, message })
       });
+      this.messageSubject.next(`[Vous]: ${message}`);
     } else {
-      console.error('STOMP non connecté. Impossible d\'envoyer le message.');
+      console.error('STOMP non connecté.');
+    }
+  }
+  sendSupportMessage(userEmail: string, message: string): void {
+    if (this.stompClient && this.stompClient.connected) {
+      const payload = JSON.stringify({ userEmail, message, from: 'support' });
+      this.stompClient.publish({
+        destination: '/app/sendSupportMessage',
+        body: payload
+      });
+      this.messageSubject.next(payload);
+    } else {
+      console.error('STOMP non connecté.');
     }
   }
 

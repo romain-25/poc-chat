@@ -1,6 +1,23 @@
+<div class="daddy">
+  <div class="container">
+    <mat-card class="chat-box">
+      @for (msg of messages; track msg) {
+        <div class="m-15">
+          <mat-card appearance="outlined">
+            <mat-card-content>{{ msg }}</mat-card-content>
+          </mat-card>
+        </div>
+      }
+    </mat-card>
+    <div class="form">
+      <mat-form-field>
+        <mat-label>Écrire un message</mat-label>
+        <textarea matInput [(ngModel)]="newMessage"></textarea>
+      </mat-form-field>
 
-@for (message of messages; track message) {
-  <div>{{ message }}</div>
-}
-<input [(ngModel)]="newMessage" />
-<button (click)="sendMessage()">Envoyer</button>
+      <button mat-raised-button (click)="sendMessage()">Envoyer</button>
+    </div>
+  </div>
+
+</div>
+

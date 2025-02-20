@@ -1,0 +1,27 @@
+<div class="daddy">
+  <div class="container">
+    <mat-tab-group>
+      @for (userEmail of Object.keys(chatWindows); track userEmail) {
+        <mat-tab [label]="'Utilisateur ' + userEmail">
+          <mat-card class="chat-box">
+            @for (message of chatWindows[userEmail]; track message) {
+              <div class="m-15">
+                <mat-card appearance="outlined">
+                  <mat-card-content>{{ message }}</mat-card-content>
+                </mat-card>
+              </div>
+            }
+          </mat-card>
+            <div class="form mt-15 mb-15">
+              <mat-form-field>
+                <mat-label>Répondre à {{ userEmail }}</mat-label>
+                <textarea matInput [(ngModel)]="responses[userEmail]"></textarea>
+              </mat-form-field>
+              <button mat-raised-button (click)="sendSupportResponse(userEmail)">Envoyer</button>
+            </div>
+
+        </mat-tab>
+      }
+    </mat-tab-group>
+  </div>
+</div>

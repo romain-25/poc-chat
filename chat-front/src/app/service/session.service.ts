@@ -78,7 +78,12 @@ export class SessionService {
     if(token){
       sessionStorage.setItem('tokenModel', JSON.stringify(token));
       this.isLogged = true;
-      this.router.navigate(['/chat'])
+      if(this.getSession()?.role == "SUPPORT"){
+        this.router.navigate(['/chat-support'])
+      }else{
+        this.router.navigate(['/chat'])
+      }
+
       this.next();
     }
   }
